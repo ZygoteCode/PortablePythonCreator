@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.IO.Compression;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 class Program
 {
@@ -37,7 +38,7 @@ class Program
         InvokeReOrgFiles();
 
         Directory.CreateDirectory(".\\out");
-        ZipFile.CreateFromDirectory($".\\dist\\Python-{pythonVersion}", $".\\out\\PPython-{pythonVersion}-windows-amd64.zip");
+        ZipFile.CreateFromDirectory($".\\dist\\Python-{pythonVersion}", $".\\out\\portable-python-{pythonVersion}-windows-amd64.zip");
 
         Directory.Delete(".\\dist", true);
         Directory.Delete(".\\download", true);
@@ -86,7 +87,17 @@ class Program
 
     static void InvokePythonImportPatch()
     {
-        string filePath = $".\\dist\\Python-{pythonVersion}\\python38._pth";
+        string filePath = "";
+
+        foreach (string file in Directory.GetFiles($".\\dist\\Python-{pythonVersion}"))
+        {
+            if (Path.GetExtension(file).ToLower().Equals("._pth"))
+            {
+                filePath = file;
+                break;
+            }
+        }
+
         string[] lines = File.ReadAllLines(filePath);
 
         for (int i = 0; i < lines.Length; i++)
@@ -108,7 +119,7 @@ class Program
 
     static void InvokeReOrgFiles()
     {
-        string[] keepFiles = { "python.cat", "python.exe", "python38.dll", "pythonw.exe", "python38._pth" };
+        string[] keepFiles = { "python.cat", "python.exe", "python38.dll", "pythonw.exe" };
 
         Directory.CreateDirectory($".\\dist\\Python-{pythonVersion}\\Lib");
         Directory.CreateDirectory($".\\dist\\Python-{pythonVersion}\\Lib\\site-packages");
@@ -119,7 +130,7 @@ class Program
 
             foreach (string keepFile in keepFiles)
             {
-                if (Path.GetFileName(file).ToLower().Equals(keepFile.ToLower()))
+                if (Path.GetFileName(file).ToLower().Equals(keepFile.ToLower()) || Path.GetExtension(file).ToLower().Equals("._pth"))
                 {
                     exists = true;
                     break;
