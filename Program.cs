@@ -11,7 +11,7 @@ class Program
 
     public static void Main(string[] args)
     {
-        Console.Title = "PortablePythonCreator | Made by https://github.com/GabryB03/";
+        Console.Title = "PortablePythonCreator | Made by https://github.com/ZygoteCode/";
 
         while (pythonVersion == "")
         {
